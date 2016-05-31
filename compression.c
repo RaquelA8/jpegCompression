@@ -52,6 +52,46 @@ void quantizeAll(int *channel, int width, int height, int *quantTable){
 	}	
 }
 
+void zigzagging(int *channel, int size){
+    
+    int i, j, m, n;
+    m=size;
+    int array_zig[m*m];
+
+        for (i = n = 0; i < m * 2; i++)
+    {
+        for (j = (i < m) ? 0 : i-m+1; j <= i && j < m; j++)
+        {
+            array_zig[n]=channel[(i&1)? j*(m-1)+i : (i-j)*m+j ] ;
+            n++;
+        }
+    }
+    channel = array_zig;
+    
+    for (i=0;i<m*m;i++){
+        printf("%d ", channel[i]);
+    }
+    
+}
+/*int zigzagging(int *channel){
+	int i;
+	int j;
+	int aux[64]={channel[0], channel[1], channel[8], channel[16], channel[9], channel[2], channel[3], channel[10], 
+				channel[17], channel[24], channel[32], channel[25], channel[18], channel[11], channel[4], channel[5],
+				channel[12], channel[19], channel[26], channel[33], channel[40], channel[48], channel[41], channel[34],
+				channel[27], channel[20], channel[13], channel[6], channel[7], channel[14], channel[21], channel[28],
+				channel[28], channel[35], channel[42], channel[49], channel[56], channel[57], channel[50], channel[43],
+				channel[36], channel[29], channel[22], channel[15], channel[23], channel[37], channel[44], channel[51],
+				channel[58], channel[59], channel[52], channel[45], channel[38], channel[31], channel[39], channel[46],
+				channel[53], channel[60], channel[61], channel[54], channel[47], channel[55], channel[62], channel[63]};
+		
+	for(i=0; i<64; i++){
+	printf("%d ", aux[i]);
+		}
+return aux;
+}
+*/
+
 void computeCmatrix(double C[8][8],double Ct[8][8],int N){
 	double pi = atan( 1.0 ) * 4.0;
 	int i;
@@ -141,23 +181,8 @@ void downsample(uchar *pixel, int b, int x, int y, int *Ychannel, int *Cbchannel
 	}
 
 }
-int zigzagging(int *channel){
-	int i;
-	int j;
-	int aux[64]={channel[0], channel[1], channel[8], channel[16], channel[9], channel[2], channel[3], channel[10], 
-				channel[17], channel[24], channel[32], channel[25], channel[18], channel[11], channel[4], channel[5],
-				channel[12], channel[19], channel[26], channel[33], channel[40], channel[48], channel[41], channel[34],
-				channel[27], channel[20], channel[13], channel[6], channel[7], channel[14], channel[21], channel[28],
-				channel[28], channel[35], channel[42], channel[49], channel[56], channel[57], channel[50], channel[43],
-				channel[36], channel[29], channel[22], channel[15], channel[23], channel[37], channel[44], channel[51],
-				channel[58], channel[59], channel[52], channel[45], channel[38], channel[31], channel[39], channel[46],
-				channel[53], channel[60], channel[61], channel[54], channel[47], channel[55], channel[62], channel[63]};
-		
-	for(i=0; i<64; i++){
-	printf("%d ", aux[i]);
-		}
-return aux;
-}
+
+
 //should be called with an image argument
 //should be called with  options with argument
 // option is -b with values corresponding to downsampling ratios
@@ -220,6 +245,7 @@ void main(int argc, char *argv[]){
 	int channelY[Yline*Ycolumn];
 	int channelCb[Cbline*Cbcolumn];
 	int channelCr[Crline*Crcolumn];
+	
 	downsample(data,b,x,y,channelY,channelCb,channelCr);
 	computeCmatrix(C,Ct,8);
 	computeAllDCT(channelY,Ycolumn,Yline);
@@ -229,6 +255,9 @@ void main(int argc, char *argv[]){
 	//quantizeAll(channelY,Ycolumn,Yline,lumQuantTable);
 	//quantizeAll(channelCb,Cbcolumn,Cbline,chromQuantTable);
 	//quantizeAll(channelCr,Crcolumn,Crline,chromQuantTable);
+
+
+
 	printf("Y channel\n");
 	printf("\n");
 	int i;
